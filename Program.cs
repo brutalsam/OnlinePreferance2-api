@@ -1,8 +1,10 @@
-using ApiWithAuth;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Configuration;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
+using OnlinePreferance2_api.Database;
+using OnlinePreferance2_api.Database.Repositories;
 using OnlinePreferance2_api.Services;
 using System.Text;
 using ConfigurationManager = OnlinePreferance2_api.Configuration.ConfigurationManager;
@@ -11,9 +13,11 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddDbContext<UsersContext>();
+builder.Services.AddDbContext<PreferanceDbContext>();
+builder.Services.AddDbContext<PreferanceDbContext>();
 ////
 builder.Services.AddScoped<TokenService, TokenService>();
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
 ////
 builder.Services.AddSwaggerGen(options =>
 {
@@ -78,7 +82,7 @@ builder.Services
         options.Password.RequireUppercase = false;
         options.Password.RequireLowercase = false;
     })
-    .AddEntityFrameworkStores<UsersContext>();
+    .AddEntityFrameworkStores<PreferanceDbContext>();
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.

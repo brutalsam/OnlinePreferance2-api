@@ -1,8 +1,8 @@
-﻿using ApiWithAuth;
-using Microsoft.AspNetCore.Identity;
+﻿using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
+using OnlinePreferance2_api.Database;
 using OnlinePreferance2_api.Model.Auth;
 using OnlinePreferance2_api.Services;
 using System.IdentityModel.Tokens.Jwt;
@@ -17,10 +17,10 @@ namespace WebAPI.Controllers
     [ApiController]
     public class AuthenticationController : ControllerBase
     {
-        private readonly UsersContext _context;
+        private readonly PreferanceDbContext _context;
         private readonly TokenService _tokenService;
         private readonly UserManager<IdentityUser> _userManager;
-        public AuthenticationController(UserManager<IdentityUser> userManager, UsersContext context, TokenService tokenService)
+        public AuthenticationController(UserManager<IdentityUser> userManager, PreferanceDbContext context, TokenService tokenService)
         {
             _userManager = userManager;
             _context = context;
