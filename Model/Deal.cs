@@ -4,17 +4,19 @@ using System.Collections.Generic;
 
 namespace OnlinePreferance2_api.Model
 {
-    public class PlayerDeck: BaseEntity
+    public class PlayerDeck
     {
+        public Player Player { get; set; }
         public List<Card> Cards { get; set; }
 
-        public PlayerDeck()
+        public PlayerDeck(Player player)
         {
             Cards = new List<Card>();
+            Player = player;
         }
     }
 
-    public class Round: BaseEntity
+    public class Round
     {
         public List<Card> Rounds { get; set; }
         public Round()

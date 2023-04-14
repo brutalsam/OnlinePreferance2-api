@@ -1,13 +1,15 @@
 ﻿using System;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
+using OnlinePreferance2_api.Model;
 
 #nullable disable
 
 namespace OnlinePreferance2_api.Migrations
 {
     /// <inheritdoc />
-    public partial class initialM : Migration
+    public partial class initialM4 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -38,25 +40,12 @@ namespace OnlinePreferance2_api.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Contract",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    ContractValue = table.Column<int>(type: "integer", nullable: false),
-                    Trumps = table.Column<int>(type: "integer", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Contract", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Games",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
+                    Players = table.Column<List<Player>>(type: "jsonb", nullable: false),
                     IsEnded = table.Column<bool>(type: "boolean", nullable: false),
                     CreationDate = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: false)
@@ -134,102 +123,18 @@ namespace OnlinePreferance2_api.Migrations
                     Id = table.Column<int>(type: "integer", nullable: false)
                         .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
                     Dealer = table.Column<int>(type: "integer", nullable: false),
-                    DealContractId = table.Column<int>(type: "integer", nullable: false),
+                    DealContract = table.Column<Contract>(type: "jsonb", nullable: false),
+                    InitialCards = table.Column<List<PlayerDeck>>(type: "jsonb", nullable: false),
+                    Rounds = table.Column<List<Round>>(type: "jsonb", nullable: false),
                     GameId = table.Column<int>(type: "integer", nullable: true)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Deal", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Deal_Contract_DealContractId",
-                        column: x => x.DealContractId,
-                        principalTable: "Contract",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
-                    table.ForeignKey(
                         name: "FK_Deal_Games_GameId",
                         column: x => x.GameId,
                         principalTable: "Games",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Player",
-                columns: table => new
-                {
-                    Id = table.Column<string>(type: "text", nullable: false),
-                    PlayerName = table.Column<string>(type: "text", nullable: false),
-                    GameId = table.Column<int>(type: "integer", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Player", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Player_Games_GameId",
-                        column: x => x.GameId,
-                        principalTable: "Games",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "PlayerDeck",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    DealId = table.Column<int>(type: "integer", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_PlayerDeck", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_PlayerDeck_Deal_DealId",
-                        column: x => x.DealId,
-                        principalTable: "Deal",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Round",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    DealId = table.Column<int>(type: "integer", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Round", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Round_Deal_DealId",
-                        column: x => x.DealId,
-                        principalTable: "Deal",
-                        principalColumn: "Id");
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Card",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "integer", nullable: false)
-                        .Annotation("Npgsql:ValueGenerationStrategy", NpgsqlValueGenerationStrategy.IdentityByDefaultColumn),
-                    Value = table.Column<int>(type: "integer", nullable: false),
-                    Suit = table.Column<int>(type: "integer", nullable: false),
-                    PlayerDeckId = table.Column<int>(type: "integer", nullable: true),
-                    RoundId = table.Column<int>(type: "integer", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Card", x => x.Id);
-                    table.ForeignKey(
-                        name: "FK_Card_PlayerDeck_PlayerDeckId",
-                        column: x => x.PlayerDeckId,
-                        principalTable: "PlayerDeck",
-                        principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Card_Round_RoundId",
-                        column: x => x.RoundId,
-                        principalTable: "Round",
                         principalColumn: "Id");
                 });
 
@@ -255,39 +160,9 @@ namespace OnlinePreferance2_api.Migrations
                 unique: true);
 
             migrationBuilder.CreateIndex(
-                name: "IX_Card_PlayerDeckId",
-                table: "Card",
-                column: "PlayerDeckId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Card_RoundId",
-                table: "Card",
-                column: "RoundId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Deal_DealContractId",
-                table: "Deal",
-                column: "DealContractId");
-
-            migrationBuilder.CreateIndex(
                 name: "IX_Deal_GameId",
                 table: "Deal",
                 column: "GameId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Player_GameId",
-                table: "Player",
-                column: "GameId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_PlayerDeck_DealId",
-                table: "PlayerDeck",
-                column: "DealId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Round_DealId",
-                table: "Round",
-                column: "DealId");
         }
 
         /// <inheritdoc />
@@ -303,25 +178,10 @@ namespace OnlinePreferance2_api.Migrations
                 name: "AspNetUserTokens");
 
             migrationBuilder.DropTable(
-                name: "Card");
-
-            migrationBuilder.DropTable(
-                name: "Player");
-
-            migrationBuilder.DropTable(
-                name: "AspNetUsers");
-
-            migrationBuilder.DropTable(
-                name: "PlayerDeck");
-
-            migrationBuilder.DropTable(
-                name: "Round");
-
-            migrationBuilder.DropTable(
                 name: "Deal");
 
             migrationBuilder.DropTable(
-                name: "Contract");
+                name: "AspNetUsers");
 
             migrationBuilder.DropTable(
                 name: "Games");

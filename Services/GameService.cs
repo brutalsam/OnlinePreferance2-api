@@ -21,24 +21,25 @@ namespace OnlinePreferance2_api.Services
                 Deals = new List<Deal>(),
                 CreationDate = DateTime.Now
              };
-            newGame.Deals.Add(new Deal());
-            //var initialDeal = CreateDeal();
-            //newGame.Deals.Add(initialDeal);
+            //newGame.Deals.Add(new Deal());
+            var initialDeal = CreateDeal(players);
+            initialDeal.DealContract = new Contract { ContractValue = (int)ContractValue.Six, Trumps = CardSuit.Heart};
+            newGame.Deals.Add(initialDeal);
             newGame.Description = createGameModel.Description;
             return newGame;
         }
 
-        public static Deal CreateDeal()
+        public static Deal CreateDeal(List<Player> players)
         {
             var newDeal = new Deal();
             var deck = new Deck();
 
             var list = deck.GetAllShuffledCards();
 
-            // Draw on  three players`
-            var player1Cards = new PlayerDeck();
-            var player2Cards = new PlayerDeck();
-            var player3Cards = new PlayerDeck();
+            // Draw on  three players
+            var player1Cards = new PlayerDeck(players[0]);
+            var player2Cards = new PlayerDeck(players[1]);
+            var player3Cards = new PlayerDeck(players[2]);
 
             for (var i = 0; i <= 4; i++)
             {

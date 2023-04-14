@@ -27,7 +27,7 @@ namespace OnlinePreferance2_api.Model
         Ace = 14,
     }
 
-    public class Card: BaseEntity
+    public class Card
     {
         public Card(CardValue value, CardSuit suit)
         {

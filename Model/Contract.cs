@@ -11,7 +11,7 @@ namespace OnlinePreferance2_api.Model
         Ten = 10,
         Misere = 11
     }
-    public class Contract : BaseEntity
+    public class Contract
     {
         public int ContractValue { get; set; }
         public CardSuit Trumps { get; set; }
