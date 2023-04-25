@@ -5,6 +5,7 @@ using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using OnlinePreferance2_api.Database;
 using OnlinePreferance2_api.Database.Repositories;
+using OnlinePreferance2_api.Model.Auth;
 using OnlinePreferance2_api.Services;
 using System.Text;
 using ConfigurationManager = OnlinePreferance2_api.Configuration.ConfigurationManager;
@@ -72,7 +73,7 @@ builder.Services.AddAuthentication(opt =>
         };
 });
 builder.Services
-    .AddIdentityCore<IdentityUser>(options =>
+    .AddIdentityCore<ApplicationUser>(options =>
     {
         options.SignIn.RequireConfirmedAccount = false;
         options.User.RequireUniqueEmail = true;

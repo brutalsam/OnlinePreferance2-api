@@ -1,8 +1,7 @@
-﻿using System.Globalization;
-using System.IdentityModel.Tokens.Jwt;
+﻿using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
+using System.Security.Cryptography;
 using System.Text;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using ConfigurationManager = OnlinePreferance2_api.Configuration.ConfigurationManager;
 
@@ -10,58 +9,48 @@ namespace OnlinePreferance2_api.Services
 {
     public class TokenService
     {
-        private const int ExpirationMinutes = 1;
-        public string CreateToken(IdentityUser user)
+        public static JwtSecurityToken CreateToken(List<Claim> authClaims)
         {
-            var expiration = DateTime.UtcNow.AddDays(ExpirationMinutes);
-            var token = CreateJwtToken(
-                CreateClaims(user),
-                CreateSigningCredentials(),
-                expiration
-            );
+            var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(ConfigurationManager.AppSetting["JWT:Secret"]));
+            _ = int.TryParse(ConfigurationManager.AppSetting["JWT:TokenValidityInMinutes"], out int tokenValidityInMinutes);
+
+            var token = new JwtSecurityToken(
+                issuer: ConfigurationManager.AppSetting["JWT:ValidIssuer"],
+                audience: ConfigurationManager.AppSetting["JWT:ValidAudience"],
+                expires: DateTime.Now.AddMinutes(tokenValidityInMinutes),
+                claims: authClaims,
+                signingCredentials: new SigningCredentials(authSigningKey, SecurityAlgorithms.HmacSha256)
+                );
+
+            return token;
+        }
+
+        public static ClaimsPrincipal? GetPrincipalFromExpiredToken(string? token)
+        {
+            var tokenValidationParameters = new TokenValidationParameters
+            {
+                ValidateAudience = false,
+                ValidateIssuer = false,
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(ConfigurationManager.AppSetting["JWT:Secret"])),
+                ValidateLifetime = false
+            };
+
             var tokenHandler = new JwtSecurityTokenHandler();
-            return tokenHandler.WriteToken(token);
+            var principal = tokenHandler.ValidateToken(token, tokenValidationParameters, out SecurityToken securityToken);
+            if (securityToken is not JwtSecurityToken jwtSecurityToken || !jwtSecurityToken.Header.Alg.Equals(SecurityAlgorithms.HmacSha256, StringComparison.InvariantCultureIgnoreCase))
+                throw new SecurityTokenException("Invalid token");
+
+            return principal;
+
         }
 
-        private JwtSecurityToken CreateJwtToken(List<Claim> claims, SigningCredentials credentials,
-            DateTime expiration) =>
-            new(
-                "apiWithAuthBackend",
-                "apiWithAuthBackend",
-                claims,
-                expires: expiration,
-                signingCredentials: credentials
-            );
-
-        private List<Claim> CreateClaims(IdentityUser user)
+        public static string GenerateRefreshToken()
         {
-            try
-            {
-                var claims = new List<Claim>
-                {
-                    new Claim(JwtRegisteredClaimNames.Sub, "TokenForTheApiWithAuth"),
-                    new Claim(JwtRegisteredClaimNames.Jti, Guid.NewGuid().ToString()),
-                    new Claim(JwtRegisteredClaimNames.Iat, DateTime.UtcNow.ToString(CultureInfo.InvariantCulture)),
-                    new Claim(ClaimTypes.NameIdentifier, user.Id),
-                    new Claim(ClaimTypes.Name, user.UserName),
-                    new Claim(ClaimTypes.Email, user.Email)
-                };
-                return claims;
-            }
-            catch (Exception e)
-            {
-                Console.WriteLine(e);
-                throw;
-            }
-        }
-        private SigningCredentials CreateSigningCredentials()
-        {
-            return new SigningCredentials(
-                new SymmetricSecurityKey(
-                    Encoding.UTF8.GetBytes(ConfigurationManager.AppSetting["JwtSecretSignKey"])
-                ),
-                SecurityAlgorithms.HmacSha256
-            );
+            var randomNumber = new byte[64];
+            using var rng = RandomNumberGenerator.Create();
+            rng.GetBytes(randomNumber);
+            return Convert.ToBase64String(randomNumber);
         }
     }
 }
