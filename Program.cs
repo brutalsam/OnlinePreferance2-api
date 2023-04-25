@@ -65,8 +65,8 @@ builder.Services.AddAuthentication(opt =>
             ValidateAudience = true,
             ValidateLifetime = true,
             ValidateIssuerSigningKey = true,
-            ValidIssuer = "apiWithAuthBackend",
-            ValidAudience = "apiWithAuthBackend",
+            ValidIssuer = ConfigurationManager.AppSetting["JWT:ValidIssuer"],//"apiWithAuthBackend",
+            ValidAudience = ConfigurationManager.AppSetting["JWT:ValidAudience"],//"apiWithAuthBackend",
             IssuerSigningKey = new SymmetricSecurityKey(
                 Encoding.UTF8.GetBytes(ConfigurationManager.AppSetting["JwtSecretSignKey"])
             ),

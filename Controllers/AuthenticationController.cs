@@ -16,13 +16,11 @@ namespace WebAPI.Controllers
     public class AuthenticationController : ControllerBase
     {
         private readonly PreferanceDbContext _context;
-        //private readonly TokenService _tokenService;
         private readonly UserManager<ApplicationUser> _userManager;
-        public AuthenticationController(UserManager<ApplicationUser> userManager, PreferanceDbContext context, TokenService tokenService)
+        public AuthenticationController(UserManager<ApplicationUser> userManager, PreferanceDbContext context)
         {
             _userManager = userManager;
             _context = context;
-            //_tokenService = tokenService;
         }
         
 

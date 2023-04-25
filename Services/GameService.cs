@@ -3,12 +3,13 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Identity;
 using OnlinePreferance2_api.Model;
+using OnlinePreferance2_api.Model.Auth;
 
 namespace OnlinePreferance2_api.Services
 {
     public class GameService
     {
-        public static async Task<Game> CreateNewGame(GameCreateModel createGameModel, UserManager<IdentityUser> userManager)
+        public static async Task<Game> CreateNewGame(GameCreateModel createGameModel, UserManager<ApplicationUser> userManager)
         {
             var players = new List<Player>();
             players.Add(await GetPlayerFromEmail(createGameModel.Player1, userManager));
@@ -55,7 +56,7 @@ namespace OnlinePreferance2_api.Services
             return newDeal;
         }
 
-        private static async Task<Player> GetPlayerFromEmail(string email, UserManager<IdentityUser> userManager)
+        private static async Task<Player> GetPlayerFromEmail(string email, UserManager<ApplicationUser> userManager)
         {
             var user = await userManager.FindByEmailAsync(email);
             return new Player

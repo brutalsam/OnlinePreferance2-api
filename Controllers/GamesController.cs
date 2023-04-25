@@ -4,6 +4,7 @@ using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using OnlinePreferance2_api.Database.Repositories;
 using OnlinePreferance2_api.Model;
+using OnlinePreferance2_api.Model.Auth;
 using OnlinePreferance2_api.Services;
 
 namespace OnlinePreferance2_api.Controllers
@@ -13,9 +14,9 @@ namespace OnlinePreferance2_api.Controllers
     [Route("[controller]")]
     public class GamesController : ControllerBase
     {
-        private readonly UserManager<IdentityUser> _userManager;
+        private readonly UserManager<ApplicationUser> _userManager;
         private readonly IGenericRepository<Game> _gameRepository;
-        public GamesController(UserManager<IdentityUser> userManager, IGenericRepository<Game> gameRepository)
+        public GamesController(UserManager<ApplicationUser> userManager, IGenericRepository<Game> gameRepository)
         {
             _userManager = userManager;
             _gameRepository = gameRepository;

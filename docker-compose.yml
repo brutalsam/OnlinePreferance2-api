@@ -1,0 +1,7 @@
+services:
+  pref:
+    image: brutalsam/pref
+    container_name: pref
+    ports:
+        - 80:80
+    restart: unless-stopped
