@@ -3,7 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace OnlinePreferance2_api.Controllers
 {
-    [ApiController, Authorize]
+    [ApiController]
     [Route("[controller]")]
     public class WeatherForecastController : ControllerBase
     {
@@ -22,6 +22,7 @@ namespace OnlinePreferance2_api.Controllers
         [HttpGet(Name = "GetWeatherForecast")]
         public IEnumerable<WeatherForecast> Get()
         {
+            _logger.LogInformation("GetWeatherForecast API executed");
             return Enumerable.Range(1, 5).Select(index => new WeatherForecast
             {
                 Date = DateTime.Now.AddDays(index),
